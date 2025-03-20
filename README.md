@@ -25,3 +25,6 @@ b. Allow dynamic interaction (e.g., zooming, filtering, drill-down) to facilitat
 depth exploration of the data.
 c. Provide clear labelling and titles for axes, legends, and other visual elements to
 enhance readability and understanding.
+
+### Additional Info
+Used 5 wires, featherwing, esp32, usb, breadboard, dt11, veml6070, jumper wires x5 + 4
