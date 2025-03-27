@@ -1,0 +1,56 @@
+from time import sleep
+from machine import Pin, I2C
+import dht
+import struct
+from neopixel import NeoPixel
+import veml6070
+
+# Pin setup for NeoPixel LED
+neopixel_pin = Pin(21, Pin.OUT)
+npm = NeoPixel(neopixel_pin, 1)  # Only one LED
+on = 25  # Brightness for NeoPixel color
+
+# DHT11 Setup (temperature and humidity sensor)
+dht_pin = Pin(14)  # Adjust the pin based on your connection
+sensor = dht.DHT11(dht_pin)
+
+# I2C setup for VEML6070 (UV sensor)
+i2c = I2C(1, scl=Pin(22), sda=Pin(23))  # Use appropriate SCL/SDA pins for your board
+uv_sensor = veml6070.VEML6070(i2c)
+
+# Check I2C devices to confirm the sensor is connected
+print("I2C devices:", i2c.scan())
+
+# Initialize the VEML6070 sensor
+uv_sensor = veml6070.VEML6070(i2c)
+
+# Main loop
+while True:
+    # Read UV index from VEML6070 sensor
+    uv_index = uv_sensor.read_uv()
+    print("UV Index:", uv_index)
+    
+    # Read temperature and humidity from DHT11
+    sensor.measure()
+    temperature = sensor.temperature()  # Temperature in Celsius
+    humidity = sensor.humidity()       # Humidity as percentage
+    print('Temperature:', temperature, '°C')
+    print('Humidity:', humidity, '%')
+
+    # Check the UV index and update NeoPixel color
+    if uv_index < 2.0:  # Adjust the threshold as needed
+        # Set NeoPixel to red (insufficient UV light)
+        npm.fill((255, 0, 0))  # Red color
+    else:
+        # Set NeoPixel to green (adequate UV light)
+        npm.fill((0, 255, 0))  # Green color
+    
+    # Update the LED status
+    npm.write()
+    
+    # Wait for 2 seconds before taking the next reading
+    sleep(2)
+
+    #Clear the NeoPixel after each cycle to reset it
+    npm.fill((0, 0, 0))  # Turn off the NeoPixel
+    npm.write()
